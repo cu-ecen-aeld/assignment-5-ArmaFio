@@ -12,11 +12,15 @@ jobs:
         timeout-minutes: 120
         steps:
           - uses: actions/checkout@v2
+          - name: Bypass Zscaler/SSL errors
+            run: git config --global http.sslVerify false
           - name: Checkout submodules
             run: git submodule update --init --recursive
           - uses: webfactory/ssh-agent@v0.5.3
             with:
                 ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          - name: Configure wget for Zscaler
+            run: echo "check_certificate = off" >> ~/.wgetrc
           - name: Run full test
             env:
               GIT_SSH_COMMAND: "ssh -o StrictHostKeyChecking=no"
